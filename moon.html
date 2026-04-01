@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>快速開發：相機與方位角</title>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: sans-serif; background: #000; }
+        /* 1. 相機影像填滿全螢幕 */
+        #video {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            object-fit: cover; z-index: -1;
+        }
+        /* 2. 方位資訊介面 */
+        #info {
+            position: absolute; top: 20px; left: 20px;
+            color: white; background: rgba(0,0,0,0.6);
+            padding: 15px; border-radius: 10px;
+        }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <video id="video" autoplay playsinline></video>
+
+    <div id="info">
+        <h3>手機方位儀</h3>
+        <p>方位角 (Alpha): <span id="alpha">0</span>°</p>
+        <p id="status">請點擊下方按鈕啟動感測器</p>
+        <button id="startBtn">啟動功能</button>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const alphaDisplay = document.getElementById('alpha');
+        const status = document.getElementById('status');
+        const startBtn = document.getElementById('startBtn');
+
+        // --- 功能 A: 啟動後相機 ---
+        async function initCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "environment" }, // 強制使用後鏡頭
+                    audio: false
+                });
+                video.srcObject = stream;
+            } catch (err) {
+                status.innerText = "相機啟動失敗: " + err.message;
+            }
+        }
+
+        // --- 功能 B: 取得方位角度 ---
+        function handleOrientation(event) {
+            // alpha 是繞著 Z 軸旋轉的角度 (0-360)，即指南針方位
+            let alpha = event.alpha;
+            if (alpha !== null) {
+                alphaDisplay.innerText = alpha.toFixed(2);
+            }
+        }
+
+        // --- 功能 C: 處理權限與啟動 ---
+        startBtn.addEventListener('click', async () => {
+            // 1. 啟動相機
+            await initCamera();
+
+            // 2. 請求感測器權限 (iOS 13+ 特別需要)
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                try {
+                    const permission = await DeviceOrientationEvent.requestPermission();
+                    if (permission === 'granted') {
+                        window.addEventListener('deviceorientation', handleOrientation);
+                        status.innerText = "功能運作中";
+                        startBtn.style.display = 'none';
+                    } else {
+                        status.innerText = "感測器權限被拒絕";
+                    }
+                } catch (err) {
+                    status.innerText = "要求權限時發生錯誤";
+                }
+            } else {
+                // Android 或較舊的 iOS 直接監聽
+                window.addEventListener('deviceorientation', handleOrientation);
+                status.innerText = "功能運作中 (Android)";
+                startBtn.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
