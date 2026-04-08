@@ -17,6 +17,17 @@
             position: absolute; top: 20px; left: 20px;
             color: white; background: rgba(0,0,0,0.6);
             padding: 15px; border-radius: 10px;
+            max-width: 300px;
+        }
+        #moonPhase {
+            margin-top: 10px;
+            text-align: center;
+        }
+        #moonImage {
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            margin: 10px auto;
+            display: block;
         }
         button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
     </style>
@@ -30,6 +41,10 @@
         <p>方位角 (Alpha): <span id="alpha">0</span>°</p>
         <p id="status">請點擊下方按鈕啟動感測器</p>
         <button id="startBtn">啟動功能</button>
+        <div id="moonPhase">
+            <p>月相: <span id="phaseName">未知</span></p>
+            <img id="moonImage" src="" alt="月相圖片">
+        </div>
     </div>
 
     <script>
@@ -37,6 +52,26 @@
         const alphaDisplay = document.getElementById('alpha');
         const status = document.getElementById('status');
         const startBtn = document.getElementById('startBtn');
+        const phaseName = document.getElementById('phaseName');
+        const moonImage = document.getElementById('moonImage');
+
+        // 月相資料
+        const moonPhases = [
+            { name: '新月', image: 'moon/new-moon.jpg' },
+            { name: '蛾眉月', image: 'moon/waxing-crescent.jpg' },
+            { name: '上弦月', image: 'moon/first-quarter.jpg' },
+            { name: '盈凸月', image: 'moon/waxing-gibbous.jpg' },
+            { name: '滿月', image: 'moon/full.webp' },
+            { name: '虧凸月', image: 'moon/waning-gibbous.webp' },
+            { name: '下弦月', image: 'moon/third-quarter.webp' },
+            { name: '殘月', image: 'moon/waning-crescent.webp' }
+        ];
+
+        // 根據方位角計算月相
+        function getMoonPhase(alpha) {
+            const index = Math.floor(alpha / 45) % 8;
+            return moonPhases[index];
+        }
 
         // --- 功能 A: 啟動後相機 ---
         async function initCamera() {
@@ -57,6 +92,10 @@
             let alpha = event.alpha;
             if (alpha !== null) {
                 alphaDisplay.innerText = alpha.toFixed(2);
+                // 更新月相
+                const phase = getMoonPhase(alpha);
+                phaseName.innerText = phase.name;
+                moonImage.src = phase.image;
             }
         }
 
