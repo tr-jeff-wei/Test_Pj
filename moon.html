@@ -11,18 +11,28 @@
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%;
             object-fit: cover; z-index: -1;
-            transform: scaleX(-1) scaleY(-1); /* 左右顛倒 + 上下顛倒 */
+            transform: scaleY(-1); /* 上下顛倒 */
         }
         /* 2. 方位資訊介面 */
         #info {
             position: absolute; top: 20px; left: 20px;
             color: white; background: rgba(0,0,0,0.6);
             padding: 15px; border-radius: 10px;
-            max-width: 300px;
+            max-width: 500px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        #info > * {
+            flex: 1;
+            min-width: 200px;
         }
         #moonPhase {
             margin-top: 10px;
             text-align: center;
+        }
+        #orientation {
+            min-width: 200px;
         }
         #moonImage {
             width: 100px; height: 100px;
@@ -38,10 +48,12 @@
     <video id="video" autoplay playsinline></video>
 
     <div id="info">
-        <h3>手機方位儀</h3>
-        <p>方位角 (Alpha): <span id="alpha">0</span>°</p>
-        <p id="status">請點擊下方按鈕啟動感測器</p>
-        <button id="startBtn">啟動功能</button>
+        <div id="orientation">
+            <h3>手機方位儀</h3>
+            <p>方位角 (Alpha): <span id="alpha">0</span>°</p>
+            <p id="status">請點擊下方按鈕啟動感測器</p>
+            <button id="startBtn">啟動功能</button>
+        </div>
         <div id="moonPhase">
             <p>月相: <span id="phaseName">未知</span></p>
             <img id="moonImage" src="" alt="月相圖片">
@@ -91,6 +103,7 @@
         function handleOrientation(event) {
             // alpha 是繞著 Z 軸旋轉的角度 (0-360)，即指南針方位
             let alpha = event.alpha;
+            // alpha = 45;
             if (alpha !== null) {
                 alphaDisplay.innerText = alpha.toFixed(2);
                 // 更新月相
