@@ -32,7 +32,7 @@
             text-align: center;
         }
         #orientation {
-            min-width: 200px;
+            min-width: 60px;
         }
         #moonImage {
             width: 100px; height: 100px;
@@ -49,8 +49,8 @@
 
     <div id="info">
         <div id="orientation">
-            <h3>手機方位儀</h3>
-            <p>方位角 (Alpha): <span id="alpha">0</span>°</p>
+            <h3>方位儀</h3>
+            <p>方位角:<span id="alpha">0</span>°</p>
             <p id="status">請點擊下方按鈕啟動感測器</p>
             <button id="startBtn">啟動功能</button>
         </div>
@@ -124,7 +124,7 @@
                     const permission = await DeviceOrientationEvent.requestPermission();
                     if (permission === 'granted') {
                         window.addEventListener('deviceorientation', handleOrientation);
-                        status.innerText = "功能運作中";
+                        status.innerText = "運作中";
                         startBtn.style.display = 'none';
                     } else {
                         status.innerText = "感測器權限被拒絕";
@@ -135,7 +135,7 @@
             } else {
                 // Android 或較舊的 iOS 直接監聽
                 window.addEventListener('deviceorientation', handleOrientation);
-                status.innerText = "功能運作中 (Android)";
+                status.innerText = "運作中";
                 startBtn.style.display = 'none';
             }
         });
